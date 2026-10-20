@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Emsi Ok mu? Nok mu? — aşk, arkadaşlık, iş yeri ve akrabalar üzerine 1000 kaotik soruyla rastgele kart çekilen parti oyunu.">
+<meta name="theme-color" content="#1F5EFF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231F5EFF'/%3E%3Ctext x='50' y='68' font-family='Arial Black,Arial' font-weight='900' font-size='52' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E">
+<title>Emsi Ok mu? Nok mu?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+/* Layout: tek ekranlık parti oyunu — başlık, kategori çipleri, ortada kart destesi, altta OK / NOK düğmeleri ve skor */
+:root {
+  --bg: #F1ECF4;
+  --fg: #1F1430;
+  --muted: #6E6080;
+  --card: #FFFFFF;
+  --card-edge: #E2D8EA;
+  --sticker: #FFD43B;
+  --logo: #1F5EFF;
+  --logo-fg: #FFFFFF;
+  --sticker-fg: #1F1430;
+  --ok: #17905F;
+  --ok-soft: #DDF3E8;
+  --nok: #D93450;
+  --nok-soft: #FBE1E6;
+  --chip: #E5DCEC;
+  --special-bg: #FFF4C7;
+  --special-edge: #F2C21B;
+  --shadow: 0 18px 40px -18px rgba(50, 20, 80, .35);
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #150E1F; --fg: #F4EEF9; --muted: #A898B8; --card: #231833; --card-edge: #36274A;
+    --sticker: #FFD43B; --logo: #4A80FF; --logo-fg: #FFFFFF; --sticker-fg: #1F1430; --ok: #3CCB8E; --ok-soft: #173A2C; --nok: #FF5C78; --nok-soft: #43182A;
+    --chip: #2C2040; --special-bg: #3A2F12; --special-edge: #E0B21A; --shadow: 0 18px 40px -18px rgba(0,0,0,.7); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #150E1F; --fg: #F4EEF9; --muted: #A898B8; --card: #231833; --card-edge: #36274A;
+  --sticker: #FFD43B; --logo: #4A80FF; --logo-fg: #FFFFFF; --sticker-fg: #1F1430; --ok: #3CCB8E; --ok-soft: #173A2C; --nok: #FF5C78; --nok-soft: #43182A;
+  --chip: #2C2040; --special-bg: #3A2F12; --special-edge: #E0B21A; --shadow: 0 18px 40px -18px rgba(0,0,0,.7); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 28px;
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; flex-direction: column; gap: 4px; }
+.sticker {
+  align-self: flex-start; font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: .06em;
+  background: var(--logo); color: var(--logo-fg); padding: 4px 12px 5px; border-radius: 8px; transform: rotate(-4deg); box-shadow: 3px 3px 0 color-mix(in srgb, var(--logo) 35%, transparent);
+}
+h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(30px, 8vw, 44px); line-height: .95; letter-spacing: -.02em; text-wrap: balance; }
+h1 .ok { color: var(--ok); } h1 .nok { color: var(--nok); }
+.score { display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+.pill { border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 13px; display: flex; gap: 6px; align-items: baseline; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.nok { background: var(--nok-soft); color: var(--nok); }
+.pill b { font-family: var(--display); font-size: 17px; }
+
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; border: 1.5px solid transparent; background: var(--chip); color: var(--fg); font: 500 13px var(--body);
+  border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap;
+}
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.chip:focus-visible, button:focus-visible { outline: 3px solid var(--sticker); outline-offset: 2px; }
+
+.stage { position: relative; height: clamp(320px, 52vh, 400px); }
+.ghost, .card {
+  position: absolute; inset: 0; border-radius: 26px; background: var(--card); border: 1.5px solid var(--card-edge);
+}
+.ghost.g1 { transform: rotate(3.5deg) translateY(6px); opacity: .65; }
+.ghost.g2 { transform: rotate(-2.5deg) translateY(3px); opacity: .85; }
+.card {
+  box-shadow: var(--shadow); padding: 22px 22px 20px; display: flex; flex-direction: column; justify-content: space-between;
+  touch-action: pan-y; user-select: none; cursor: grab; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s;
+}
+.card.special { background: var(--special-bg); border: 2.5px solid var(--special-edge); }
+.card.special .cat { background: var(--sticker); color: var(--sticker-fg); }
+.card.dragging { transition: none; cursor: grabbing; }
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.cat { font-weight: 700; color: var(--fg); background: var(--chip); padding: 5px 10px; border-radius: 999px; }
+.num { font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; }
+.q { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 6.4vw, 32px); line-height: 1.12; letter-spacing: -.01em; text-wrap: balance; margin: 0; }
+.prompt { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.stamp {
+  position: absolute; top: 34%; left: 50%; font-family: var(--display); font-weight: 800; font-size: 64px; letter-spacing: .04em;
+  border: 6px solid currentColor; border-radius: 14px; padding: 0 18px; opacity: 0; pointer-events: none;
+  transform: translate(-50%, -50%) rotate(-12deg) scale(1.3); transition: opacity .15s, transform .2s;
+}
+.stamp.ok { color: var(--ok); } .stamp.nok { color: var(--nok); transform: translate(-50%, -50%) rotate(10deg) scale(1.3); }
+.stamp.show { opacity: .95; transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+.stamp.nok.show { transform: translate(-50%, -50%) rotate(10deg) scale(1); }
+
+.start, .end { text-align: left; justify-content: center; gap: 14px; cursor: default; }
+.start p, .end p { margin: 0; color: var(--muted); line-height: 1.5; max-width: 40ch; }
+.big { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 7vw, 34px); line-height: 1.05; margin: 0; text-wrap: balance; }
+.bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--chip); }
+.bar span { display: block; height: 100%; }
+
+.actions { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: stretch; }
+.btn {
+  border: 0; border-radius: 18px; font-family: var(--display); font-weight: 800; font-size: 24px; letter-spacing: .02em;
+  padding: 16px 10px; cursor: pointer; transition: transform .1s;
+}
+.btn:active { transform: scale(.96); }
+.btn.nok { background: var(--nok); color: #fff; }
+.btn.ok { background: var(--ok); color: #fff; }
+.btn.skip { background: var(--chip); color: var(--fg); font-size: 14px; font-family: var(--body); font-weight: 700; padding-inline: 16px; }
+.btn.draw { grid-column: 1 / -1; background: var(--fg); color: var(--bg); }
+.btn:disabled { opacity: .35; cursor: default; }
+.foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.foot button { background: none; border: 0; color: var(--muted); font: 500 13px var(--body); text-decoration: underline; cursor: pointer; padding: 0; }
+.keys { display: none; } @media (hover: hover) { .keys { display: inline; } }
+@media (prefers-reduced-motion: reduce) { .card, .stamp, .btn { transition: none !important; } }
+</style>
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="sticker">EMSİ</span>
+      <h1><span class="ok">Ok mu?</span> <span class="nok">Nok mu?</span></h1>
+    </div>
+    <div class="score" aria-live="polite">
+      <span class="pill ok">OK <b id="okN">0</b></span>
+      <span class="pill nok">NOK <b id="nokN">0</b></span>
+    </div>
+  </header>
+
+  <div class="chips" id="chips" role="group" aria-label="Kategoriler"></div>
+
+  <div class="stage" id="stage">
+    <div class="ghost g1"></div>
+    <div class="ghost g2"></div>
+    <div class="card start" id="card"></div>
+  </div>
+
+  <div class="actions" id="actions"></div>
+
+  <div class="foot">
+    <span id="left"></span>
+    <span class="keys">Klavye: ← NOK · → OK · boşluk atla</span>
+    <button type="button" id="reset">Desteyi baştan karıştır</button>
+  </div>
+</div>
+
+<script>
+const CATS = [
+  { id: "flort", name: "💘 Flört ve Tanışma", items: [
+    "İlk mesajı kadının atması","İlk buluşmada eski sevgiliden bahsetmek","Tanışma uygulamasında 5 yıl önceki fotoğrafı kullanmak","İlk buluşmaya arkadaşını “acil durum araması” için ayarlamak","Flört ederken boyunu 3 cm uzun söylemek","Mesaja hemen cevap vermemek için bilerek beklemek","İlk buluşmada eve davet etmek","Aynı anda iki kişiyle flört etmek","Hoşlandığın kişinin bütün Instagram’ını 2019'a kadar stalklamak","“Sadece arkadaşız” deyip sürekli ima yapmak","Ghostlayıp aylar sonra “nasılsın” yazmak","Arkadaşının eski sevgilisiyle sevgili olmak","Hoşlandığın kişiyi kıskandırmak için başkasıyla fotoğraf paylaşmak","İlk buluşmada telefonla oynamak","Hoşlandığın kişiye burç uyumunu sormak","İlk buluşmayı fast food zincirinde yapmak","Tanışma uygulamasında biyografiye sadece “sor” yazmak","İlk buluşmaya 40 dakika geç kalmak","İlk buluşmada hesabı kuruşu kuruşuna bölmek","Sadece sesli mesajla flört etmek","“Uyudun mu?” yazıp cevap gelince uyumuş gibi yapmak","İlk buluşmada evlilik ve çocuk konusunu açmak","Her mesaja sadece “haha” ile cevap vermek","Garsona kaba davranan biriyle ikinci buluşmaya çıkmak","Tanışma uygulamasında yüzü değiştiren filtre kullanmak","Hoşlandığın kişinin her story’sine anında 🔥 atmak","Ortak arkadaştan gizlice bilgi toplamak","İlk buluşmada 20 kez fotoğrafını çektirmek","Flörtün ilk haftasında “bizim şarkımız”ı ilan etmek","Biri senden hoşlandığını söyleyince ondan soğumak","Mesaj ekran görüntülerini arkadaş grubuna atıp yorum istemek","Eski sevgiliyle gittiğin mekâna yeni flörtü götürmek","Yazım hatası yapan biriyle görüşmeyi kesmek","Tanışma uygulamasında boy filtresi koymak","Sohbet açmak için onun çalma listesini ezberlemek","İlk buluşmada iki saat boyunca sadece kendinden bahsetmek","Aynı kişiye üç kez “son şans” vermek","Düğünde tanıştığın biriyle ertesi gün buluşmak","İlk buluşmayı onun spor salonunda “tesadüfen” yapmak","Flörtün eski sevgilisiyle aynı isimde olmak ve bunu dert etmek","Tanışma uygulamasında sadece köpekli fotoğraf koymak","İlk buluşmayı yürüyüş olarak yapmak","İlk buluşmada sinemaya gitmek","İlk mesajı sadece “selam” diye atmak","İlk mesajı uzun bir paragrafla atmak","İlk buluşmadan sonra eve kadar bırakmak","İlk buluşmada sarılarak vedalaşmak","İkinci buluşmaya çiçekle gelmek","İlk buluşma öncesi en sevdiği yemeği araştırmak","Flörtünün arkadaşlarını Instagram’dan tek tek incelemek","İlk buluşmada siyaset konuşmak","İlk buluşmada maaş sormak","Tanışma uygulamasında iki hafta yazışıp hiç buluşmamak","Sürekli “müsait değilim” diyen kişiye ısrar etmek","Flörtünün sana hep saatler sonra cevap vermesi","Flörtüne yanlışlıkla başka birinin adıyla seslenmek","İlk buluşmada sadece su içmek","İlk buluşmada fazla içmek","Tanışma uygulamasında “sadece arkadaşlık” yazıp flört etmek","Flörtünün senden sürekli selfie istemesi","Hoşlandığın kişiye şiir yazmak","Hoşlandığın kişi için onun takımını tutmaya başlamak","Hoşlandığın kişi için yeni bir hobiye başlamak","Hoşlandığın kişinin spor salonuna yazılmak","Otobüste beğendiğin kişiye numaranı vermek","Sokakta tanımadığın birine iltifat etmek","Barda birine içki ısmarlamak","İlk öpücüğü ilk buluşmada beklemek","Görüntülü konuşma için saatlerce hazırlanmak","Flörtünün senden 10 yaş büyük olması","Flörtünün senden 10 yaş küçük olması","Uzak mesafe flörte başlamak","Flörtünün hayvanlardan hoşlanmaması","Flörtünün hiç kitap okumadığını söylemesi","Flörtünün sigara içmesi"
+  ]},
+  { id: "telefon", name: "📱 Telefon ve Sosyal Medya", items: [
+    "Sevgilinin telefon şifresini bilmek istemek","Konum paylaşımını sürekli açık tutmak","Sevgilinin eski sevgilisinin fotoğraflarına beğeni atması","Sevgilinin takip ettiği kişileri tek tek kontrol etmek","Sevgiliyle ortak Instagram hesabı açmak","İlişkiyi sosyal medyada hiç paylaşmamak","Sevgilinin mesajlarını onun telefonundan okumak","Sevgiliyi telefonda “Aşkım 💕” yerine adıyla kaydetmek","Keşfette karşı cinsin fotoğraflarına bakmak","Eski sevgilinin fotoğraflarını silmemek","Sevgilinin çevrimiçi olup sana yazmaması","Ayrıldıktan sonra tüm fotoğrafları arşivlemek yerine silmek","Sevgiliye ait şifreleri kullanmak (Netflix, Spotify vs.)","Sevgilinin hikâyeni görüp mesaj atmaması","Sevgilinin arkadaşıyla ondan habersiz mesajlaşmak","Sevgilinin telefonunda kendi parmak izinin kayıtlı olması","Sevgilinin “yazıyor…” olup sonra hiçbir şey göndermemesi","Mesajı görüp üç saat sonra “şimdi gördüm” demek","Profil fotoğrafını çift fotoğrafı yapmak","Sevgilinin paylaşımlarına hiç beğeni atmamak","Sevgilinin “yakın arkadaşlar” listesinde olmamak","Sevgilinin seni etiketlemeden ortak fotoğraf paylaşması","Sevgilinin son görülmesini kapatması","Attığın Reels’e sevgilinin sadece “😂” ile dönmesi","Gece sevgilinin telefonuna bildirim gelince göz ucuyla bakmak","Sevgilinin eski sevgilisini hâlâ takip etmesi","Ayrılınca takipten çıkmak yerine direkt engellemek","Sevgilinin bazı sohbetleri arşivde tutması","Çift olarak TikTok hesabı açıp içerik üretmek","Sevgilinin sabah ilk sana değil arkadaş grubuna yazması","Sevgilinin seni rehberde sadece emojiyle kaydetmesi","Sevgilinin Spotify’da ne dinlediğini anlık takip etmek","Kavga sonrası sevgiliyi WhatsApp’ta sessize almak","Görüntülü konuşurken uyuyakalmak","Sevgiliye art arda 15 mesaj atmak","Sevgilinin galerisinde senin hakkında ekran görüntüleri bulmak","Sevgilinin eski sevgilisinin story’lerini izlemesi","Ciddi tartışmaları mesajdan yapmak","Sevgilinin seni “Konum gönder” diye her saat yoklaması","Sevgilinin attığın uzun mesaja “tm” demesi","Sevgilinin kilit ekranında başka birinin fotoğrafı olması","Sevgilinin seni sosyal medyada takip etmemesi","Her gece “iyi geceler” mesajını zorunlu tutmak","Sevgilinin telefonunda seninle ilgili notlar tutması","Sevgilinin attığın caps’leri görmezden gelmesi","Sevgilinin seni engelleyip açması","Sevgilinin eski sevgilisinin numarasını silmemesi","Sevgilinin telefonunda tanışma uygulamasının hâlâ yüklü olması","İlk çift fotoğrafını ne zaman paylaşacağınız tartışması","Sevgilinin her paylaşımına yorum yazmak","Sevgilinin her gittiği yerde check-in yapması","Aynı anda çevrimiçi olup birbirinize yazmamak","Sevgilinin seni story’de etiketleyip sonra silmesi","Sevgilinin story’lerinde hiç görünmemek","Sevgiliye gece yarısı art arda TikTok atmak","Sevgilinin karşı cinsten birinin fotoğrafını kaydetmesi","Sevgilinin görüntülü aramayı reddedip mesaj atması","Sevgilinin seni hep sesli mesajla geçiştirmesi","Sevgilinin galerisinde eski sevgilisine ait bir klasör olması","Sevgilinin profilinde ilişki durumunu “bekâr” bırakması","Sevgiliyle ortak Spotify listesi yapmak","Sevgilinin telefona bakıp gülümsemesi ve “kimse” demesi","Sevgilinin telefonunu her gece sessize alması","Sevgiliyle aynı online oyunda takım olmak","Sevgilinin senin telefonuna kendi uygulamalarını yüklemesi","Sevgilinin seni “yakın arkadaşlar”a ekleyip on kişiyi daha eklemesi","Sevgilinin eski fotoğraflarını arşivden geri açması","Sevgilinin özel mesajını başkasına göstermesi","Sevgilinin en çok mesajlaştığı kişinin sen olmaması","Sevgilinin her kavgadan sonra profil fotoğrafını değiştirmesi"
+  ]},
+  { id: "kiskanclik", name: "😤 Kıskançlık ve Sınırlar", items: [
+    "Sevgilinin karşı cinsten en yakın arkadaşı olması","Sevgilinin eski sevgilisiyle görüşmesi","Sevgilinin karşı cins iş arkadaşıyla öğle yemeğine çıkması","Sevgilinin kıyafetine karışmak","Sevgilinin sensiz tatile gitmesi","Sevgilinin bekarlığa veda partisine gitmesi","Sevgilinin ünlülere “aşık” olması","Sevgilinin dans dersinde başka biriyle partner olması","Sevgilinin barda tanımadığı biriyle sohbet etmesi","Sevgilinin eski sevgilisinin doğum gününü kutlaması","Sevgilinin ex’inden kalan hediyeyi kullanmaya devam etmesi","Sevgilinin arkadaşlarıyla her hafta dışarı çıkması","“Kıskanmıyorsan sevmiyorsundur” demek","Sevgilinin gece 2'de “uyudun mu” mesajı alması","Sevgilinin seni arkadaş grubuna tanıştırmaması","Sevgilinin spor hocasının fazla yakışıklı ya da güzel olması","Sevgilinin eski sevgilisiyle aynı iş yerinde çalışması","Sevgilinin dizideki karakter için “evlenirdim” demesi","Sevgilinin seni “kanka” diye tanıtması","Sevgilinin karşı cins arkadaşının evinde kalması","Sevgilinin doğum gününde eski sevgilisinden mesaj alması","Sevgilinin düğünde başkasıyla dans etmesi","Sevgilinin sana sormadan konser bileti alıp arkadaşlarıyla gitmesi","Sevgilinin karşı cinsten biriyle her gece online oyun oynaması","Sevgilinin sana yazdığı iltifatı başkasına da yazması","Sevgiliye rüyanda seni aldattığı için küsmek","Sevgilinin her gece arkadaşıyla saatlerce telefonda konuşması","Sevgilinin eski ilişkisinden “en iyi ilişkimdi” diye bahsetmesi","Sevgilinin karşı cins arkadaşına doğum günü hediyesi alması","Sevgilinin işyerinde bir “iş eşi” olması","Sevgilinin sensiz ne kadar eğlendiğini story’den öğrenmek","Sevgilinin seni hiç kıskanmaması","Sevgilinin karşı cinsten arkadaşıyla ortak fotoğraf paylaşması","Sevgilinin telefonunu hep ekranı aşağı bakacak şekilde koyması","Sevgilinin senin arkadaşınla senden daha iyi anlaşması","Sevgilinin eski sevgilisinin düğününe gitmesi","Sevgilinin karşı cinsten hocadan özel ders alması","Sevgilinin arkadaşının sevgilisine fazla yakın olması","Sevgilinin karşı cins kuzeniyle aşırı samimi olması","Sevgilinin işten sonra iş arkadaşlarıyla içmeye gitmesi","Sevgilinin yolda birine dönüp bakması","Sevgilinin seni eski sevgilisiyle kıyaslaması","Sevgilinin karşı cinsten fizyoterapiste gitmesi","Sevgilinin ünlü biri hakkında ateşli yorumlar yapması","Sevgilinin yanında başkasından iltifat almak","Sevgilinin senin arkadaşına iltifat etmesi","Sevgilinin doğum gününü seninle değil arkadaşlarıyla kutlaması","Sevgilinin karşı cins arkadaşıyla tatile gitmesi","Sevgilinin kankasıyla kol kola yürümesi","Sevgilinin eski sevgilisinin annesiyle hâlâ konuşması","Sevgilinin karşı cins komşusuna sürekli yardım etmesi","Sevgilinin telefonla konuşurken odadan çıkması","Sevgilinin bir partiye senin hiç görmediğin kıyafetle gitmesi","Sevgilinin filmdeki oyuncu için “ne yakışıklı” ya da “ne güzel” demesi","Sevgilinin karşı cinsten biriyle ortak proje yapması","Sevgilinin seni partide yalnız bırakması","Sevgilinin karşı cins arkadaşının ona hediye alması","Sevgilinin eski sevgilisiyle aynı arkadaş grubunda olması","Sevgilinin sen yokken eski sevgilisiyle aynı ortamda olması","Sevgilinin “sadece arkadaşız” dediği kişiyle sürekli buluşması","Sevgilinin seni sürekli kıskanıp kriz çıkarması","Sevgiliyi bilerek kıskandırmak","Sevgilinin karşı cins arkadaşına “canım” demesi","Sevgilinin seni karşı cins arkadaşıyla tanıştırmaması","Sevgilinin karşı cins arkadaşıyla gece yarısı mesajlaşması"
+  ]},
+  { id: "para", name: "💸 Para ve Sorumluluk", items: [
+    "Her şeyi yarı yarıya ödemek","Hesabı her zaman erkeğin ödemesi","Ortak banka hesabı açmak","Sevgilinin maaşını bilmek istemek","Sevgiliye borç vermek","Sevgiliden pahalı hediye beklemek","Yıldönümünü unutmak","Sevgilinin hediyeni başkasına hediye etmesi","Pahalı bir şeyi sevgiliye sormadan almak","Evlenmeden aynı evde yaşamak","Kirayı maaşa göre oranlı bölmek","Sevgilinin ailesine para yardımı yapması","İlk buluşmada hesabı kadının ödemesi","Sürpriz için kredi kartını limitine dayamak","Sevgilinin harcamalarına karışmak","Hediye yerine zarfta para vermek","Sevgilinin aboneliklerinin senin kartından çekilmesi","Ayrılınca verdiğin hediyeleri geri istemek","Kim ne ödedi diye not tutmak","Ortak birikimle araba almak","Düğün birikimini kripto paraya yatırmak","Sevgilinin kredisine kefil olmak","Sevgiliden borç alıp “unutmak”","Romantik akşam yemeğinde indirim kuponu kullanmak","Sevgili işsizken bütün masrafları üstlenmek","“Hediye istemem” deyip aslında beklemek","Hediyeyi verirken indirimde aldığını söylemek","Ortak bütçe tablosu tutmak","Sevgilinin senden çok daha fazla kazanması","Tatili kim planladıysa masrafı onun ödemesi","Yıldönümü hediyesini son anda benzinlikten almak","Sevgilinin her ay ödediği taksitlerin seni de ilgilendirmesi","Sevgiliye pahalı bir saat almak için kredi çekmek","Sevgilinin kredi kartı borcunu ödemek","Sevgilinin her seferinde “cüzdanımı unuttum” demesi","Sevgiliyle ortak araba almak","Evlenmeden sevgiliyle ortak ev almak","Sevgiliye maaşını düşük söylemek","Sevgilinin harcama alışkanlıklarını eleştirmek","Kendi doğum günü pastanın parasını sevgiliye ödetmek","Sevgiliye hediye çeki almak","Sevgilinin pahalı hobisini finanse etmek","Sevgilinin pahalı restorana götürüp hesabı bölmesi","Sevgiliyle tatil için ortak kumbara yapmak","Sevgiliye ikinci el hediye vermek","Sevgilinin hediyeni iade edip parasını alması","Sevgilinin yatırım tavsiyesiyle para kaybetmek","Sevgilinin ailesinin düğün masrafını sizin ödemenizi beklemesi","Sevgiliye her ay harçlık vermek","Sevgilinin senin kartınla alışveriş yapması","Ayrılırken ortak birikimi bölüşmek","Sevgilinin indirim günlerinde habersiz alışveriş çılgınlığı","Sevgilinin hesabı ödemek için arkadaşından borç alması","İlk aylarda pahalı hediyeler alıp sonra hiç almamak","Sevgiliye ilişkinin ilk ayında araba hediye etmek","Sevgilinin işini bırakıp hayalinin peşine düşmesini finanse etmek","Sevgilinin şans oyunlarına düzenli para yatırması"
+  ]},
+  { id: "aile", name: "👨‍👩‍👧 Aile ve Çevre", items: [
+    "Sevgilinin ailesiyle tatile gitmek","Annesinin her şeye karışması","Ailenin onaylamadığı biriyle evlenmek","Sevgilinin ailesiyle tartışmak","Her bayramı aynı ailede geçirmek","Kayınvalidenin evin anahtarının olması","Sevgilinin annesine her gün telefon etmesi","Ailene sevgiliden yıllarca bahsetmemek","Arkadaşların sevgilini sevmezse ayrılmak","Sevgilinin arkadaşlarını sevmediğini saklamak","Sevgilinin ailesiyle ilk tanışmaya eli boş gitmek","Sevgilinin annesine “anne” demek","Kayınvalideyle aynı apartmanda oturmak","Aileyle tanışmayı 2 yıldır ertelemek","Bayram ziyaretini mesajla geçiştirmek","Sevgilinin kardeşinin hayatına karışmak","Ailenin seni sevgilinin eski sevgilisiyle kıyaslaması","Sevgilinin babasının takımını açıkça kötülemek","Her pazar kahvaltısını ailecek yapmak","Sevgilinin ailesinin WhatsApp grubuna eklenmek","Aile yemeğinde sevgilinin tarafını tutmamak","Ailelerden gizli tatile gitmek","Annenin sevgilinin yaptığı yemeği eleştirmesi","Kayınpederle ilk tanışmada rakı masasına oturmak","Arkadaşlarının ilişkinizle ilgili her şeyi bilmesi","Sevgilinin en yakın arkadaşını sevmemek","Çocuğa kimin ailesinden isim konacağı için tartışmak","Sevgilinin ailesinin evinde ayrı odalara yatırılmak","Ailene sevgilinin mesleğini olduğundan havalı anlatmak","Kayınvalidenin haber vermeden misafirliğe gelmesi","Sevgilinin ailesine ilk tanışmada yalan söylemek","Sevgilinin annesinin seni sosyal medyada takip etmesi","Sevgilinin babasının sana iş teklif etmesi","Sevgilinin ailesinin bayramda sizde kalması","Sevgilinin ailesine kendi ailenden daha yakın olmak","Sevgilinin ailesiyle senin ailenin anlaşamaması","Sevgilinin annesinin sana onun çocukluk albümünü göstermesi","Sevgilinin ailesinin evinde kendi evindeymiş gibi davranmak","Sevgilinin ailesinin ilişkinizi herkese senden önce duyurması","Sevgilinin ailesinin seni eski sevgilinin adıyla çağırması","Sevgilinin annesinin seninle her gün telefonda konuşması","Sevgilinin kardeşinin seni sevmemesi","Sevgilinin ailesine yemek yapıp beğenilmemek","Sevgilinin ailesinin yanında sevgiline sarılmak","Sevgilinin ailesine siyasi görüşünü söylemek","Sevgilinin ailesinin hakkında araştırma yaptırması","Sevgilinin ailesinin “ne iş yapıyorsun?” diye üç kez sorması","Sevgilinin ailesine bayramda el öpmemek","Sevgilinin dedesinin evlenmeden sana “gelinim” ya da “damadım” demesi","İki ailenin söz kesilmeden önce tanışması"
+  ]},
+  { id: "evlilik", name: "💍 Ciddi İlişki ve Evlilik", items: [
+    "Evlenmeden önce en az 1 yıl beraber yaşamak","Evlilik teklifini kalabalık içinde yapmak","Evlilik teklifini reddetmek","Yüzük seçimini sevgilinin kendisine bırakmak","Düğün yerine o parayla dünya turuna çıkmak","Evlilik sözleşmesi (mal ayrılığı) imzalamak","Çocuk istemediğini ilişkinin başında söylemek","Evlendikten sonra ayrı odada uyumak","Evlilikte ayrı tatiller yapmak","Soyadı değiştirmemek","Düğüne eski sevgiliyi davet etmek","10 yıl sevgili kalıp evlenmemek","Evlilik teklifini Instagram story’sinde yapmak","Tektaş yüzüğü 12 taksitle almak","Düğünde takı yerine IBAN paylaşmak","Düğünde halay yerine sadece slow dans","Kına gecesine damadın da katılması","Balayına ailelerle birlikte gitmek","Evlendikten sonra bütün şifreleri paylaşmak","Evlilikte “benim param, senin paran” ayrımı","Gelinlik ya da damatlık seçimine karşı tarafın karışması","Düğünü sadece 20 kişiyle yapmak","Nikâh şahidi olarak karşı cinsten en yakın arkadaşı seçmek","Teklif olmadan evlilik kararını masada beraber vermek","Evlendikten sonra 5 yıl çocuk yapmamak","Düğün fotoğrafçısına salondan fazla para vermek","Evlendikten sonra ayrı şehirlerde yaşamaya devam etmek","Evlenmeden çocuk sahibi olmak","Her yıldönümünü aynı restoranda kutlamak","Düğünde ayakkabı saklayıp para istemek","Nişanı büyük, düğünü küçük yapmak","Nişan yüzüğünü kaybetmek","Düğün tarihini 22.02.2022 gibi özel bir tarihe denk getirmek","Düğünü yurt dışında yapmak","Düğün davetiyesini dijital göndermek","Düğüne çocuk getirilmesini istememek","İlk dans için aylarca kursa gitmek","Düğünde DJ yerine çalma listesi açmak","Gelin ve damadın düğünde konuşma yapması","Gelinin düğün gecesi kıyafet değiştirmesi","Düğünde eski sevgililerin aynı masaya oturtulması","Nikâhta “evet” demeden önce şaka yapmak","Evlendikten sonra bir yıl ailenin yanında oturmak","Evlilik yıldönümünü unutmak","Evlendikten sonra arkadaşlarla tatile gitmek","Evliliğin ilk yılında çocuk yapmak","Evde işleri tam yarı yarıya bölmek","Kadının çalışıp erkeğin evde kalması","Evlilik terapisine gitmek","Evlilik kavgalarını ailelere anlatmak","Evlilikte her şeyi ortak kararla almak","Evlenince arkadaş grubunu değiştirmek","Bekarlığa veda partisini yurt dışında yapmak","Düğünde gelin çıkarma geleneğini yapmamak","Düğün hediye listesi hazırlamak","Evlilik teklifinden önce ailesinden izin istemek","Evlilik yüzüğünü pastanın içine saklamak","Evlilik teklifinden sonra sosyal medyada dev paylaşım yapmak","Evlilikte doğum günlerini ayrı arkadaş gruplarıyla kutlamak","Evlenmek için birinin şehrini değiştirmesi"
+  ]},
+  { id: "gunluk", name: "🛋️ Günlük İlişki Kaosu", items: [
+    "Uyurken battaniyeyi tamamen çalmak","Sevgilinin dizisinde spoiler vermek","Kavga ederken eski meseleleri açmak","Tartışmada “sen bilirsin” deyip susmak","Kavgalı uyumak","Sevgilinin yemeğinden “bir lokma” deyip yarısını yemek","Her akşam ne yiyeceğiz kararını karşı tarafa bırakmak","Sevgilinin yaptığı yemeği beğenmediğini söylemek","Sevgiliyle her gün görüşmek zorunda olmak","Sevgiliyle aynı kıyafeti giymek (kombin)","“Bir şey yok” deyip aslında çok şey olmak","Sevgilinin önünde gaz çıkarmak","Sevgilinin saçmaladığını arkadaşlarına anlatmak","Kavgadan sonra özrü hediyeyle telafi etmek","Sevgilinin diş fırçasını kullanmak","Klozet kapağını hep açık bırakmak","Beraber izlenen diziyi gizlice önden izlemek","Sevgilinin hoodie’sini sonsuza kadar sahiplenmek","Klimayı 18 dereceye ayarlamak","Bulaşığı “ıslatmaya bıraktım” deyip üç gün bekletmek","Horlayan sevgilinin videosunu çekip gruba atmak","Her soruya “fark etmez” deyip sonra itiraz etmek","Uyanınca ilk iş sevgiliye değil telefona bakmak","Sevgilinin yanında tırnak kesmek","Kavgada “aynı annen gibi konuştun” demek","Sevgiliye utanç verici lakabıyla herkesin önünde seslenmek","Yatakta cips yemek","Sevgilinin seçtiği filmde ilk 10 dakikada uyumak","Saçlarını lavaboda bırakmak","Sevgilinin dolabını sormadan düzenlemek","Alarmı 7 kez ertelemek","Pizzanın son dilimini sormadan yemek","Banyoyu sabah 45 dakika işgal etmek","Biraz ateşi çıkınca ölüm döşeğindeymiş gibi davranmak","Tartışmayı kazanmak için Google’dan kanıt göstermek","Sevgiliyle oyun oynarken asla bilerek kaybetmemek","İşten gelince ilk yarım saat hiç konuşmak istememek","Dert anlatılırken dinlemek yerine hemen çözüm önermek","Ev işlerini tabloyla bölüşmek","Buz gibi ayaklarını sevgiliye dayamak","Günde beş kez “beni seviyor musun” diye sormak","Sevgiliyi arkadaşların önünde taklit etmek","Kavganın ortasında “acıktım” diye konuyu kapatmak","Sevgilinin evine habersiz gitmek","Sevgiliyle günlük sarılma kotası koymak","Sevgilinin sabah 6’da saç kurutma makinesi çalıştırması","Sevgilinin kahvaltıyı yatağa getirmesi","Sevgilinin kahvaltıda telefona bakması","Sevgiliyle aynı havluyu kullanmak","Sevgilinin çamaşırlarını yıkamak","Sevgilinin kıyafetini beğenmediğini söylemek","Sevgiliyle alışverişte saatlerce beklemek","“Ne giysem?” sorusuna dürüst cevap vermek","Sevgiliyle aynı spor programını yapmak","Sevgilinin diyetini bozmasına göz yummak","Sevgilinin yaptığı kahveyi beğenmemek","Sevgiliyle yemek yaparken mutfakta kavga etmek","Sevgiliye her gün “ne yedin?” diye sormak","Biri sabahçı, diğeri gececi olmak","Sevgilinin seni uyandırmak için yüksek sesle müzik açması","Sevgilinin seni uyurken fotoğraflaması","Sevgiliyle her akşam yürüyüşe çıkmak","Sevgiliyle iki kişilik kitap kulübü kurmak","Sevgilinin çoraplarını her yere bırakması","Sevgilinin diş macununu ortadan sıkması","Sevgilinin her sabah aynı şarkıyı söylemesi","Sevgilinin filmin sonunu tahmin edip yüksek sesle söylemesi","Kavga ederken sesini yükseltmek","İlk özrü her seferinde aynı kişinin dilemesi","Kavgada sessizlik cezası vermek","Kavgada kapıyı çarpıp çıkmak","Kavgadan sonra sevgiliyi arkadaşlarına şikâyet etmek","Sevgiliyle her şeyi birlikte yapmak zorunda hissetmek","Sevgilinin hobisini sıkıcı bulduğunu söylemek","Sevgilinin hobisine eşlik etmek zorunda kalmak","Sevgiliyle hafta sonunu ayrı ayrı geçirmek","Sevgilinin seni “anneciğim” ya da “babacığım” diye çağırması","Sevgilinin seninle bebek sesiyle konuşması","Sevgilinin kahkahasının restoranı inletmesi","Sevgilinin restoranda yemeği geri göndermesi","Sevgilinin garsona bahşiş bırakmaması","Sevgilinin trafikte sinirlenip korna çalması","Sevgilinin yatakta bütün yastıkları alması"
+  ]},
+  { id: "ayrilik", name: "🔥 Ayrılık ve Barışma", items: [
+    "Ayrılığı mesajla yapmak","Ayrıldıktan sonra eski sevgiliyle tekrar barışmak","Ayrıldıktan sonra eski sevgilinin ailesiyle görüşmeye devam etmek","Ayrılınca kedi/köpek velayeti için savaşmak","Ayrılıktan 1 hafta sonra yeni ilişkiye başlamak","Eski sevgiliye sarhoşken mesaj atmak","Eski sevgilinin yeni sevgilisini stalklamak","Ayrılırken “sorun sende değil, bende” demek","Ayrılıkta ortak arkadaşları paylaştırmak","Ayrılınca hediyeleri yakmak","Eski sevgilinin Netflix hesabını kullanmaya devam etmek","Ayrıldıktan sonra arkadaş kalmak","Ayrılık sonrası saçı kökten değiştirmek","Eski sevgilinin doğum gününü kutlamak","Ayrılınca imalı hüzünlü şarkı paylaşmak","Eski sevgilinin eşyalarını kargoyla göndermek","Ayrılığı doğum gününde yapmak","Ortak arkadaştan eski sevgilinin haberlerini almak","“Eşyalarımı almaya geleceğim” bahanesiyle görüşmek","Eski sevgilinin en yakın arkadaşıyla çıkmak","Barışmak için kapısının önünde beklemek","Ayrılıktan sonra ona tıpatıp benzeyen biriyle çıkmak","Ayrılık sebebini sosyal medyada imayla anlatmak","Eski sevgilinin düğününe gitmek","Ayrıldıktan aylar sonra “bir kahve içelim mi” demek","Ortak aldığınız eşyaları tek tek bölüşmek","Barıştıktan sonra eski kavgayı bir daha hiç açmamak","Ayrılık sonrası 3 gün yataktan çıkmamak","Ayrılmak yerine “mola veriyoruz” demek","Ayrıldıktan sonra yeni sevgilinin fotoğrafını özellikle görünür paylaşmak","Ayrılıktan sonra eski sevgilinin Spotify listesini dinlemeye devam etmek","Ayrılıktan sonra ortak köpeği ziyarete gitmek","Ayrılıktan sonra eski sevgilinin anneni araması","Ayrılınca ortak mekânlara gitmeyi bırakmak","Ayrılıktan sonra “son bir konuşma” istemek","Ayrılıktan hemen sonra tanışma uygulamasına dönmek","Ayrılıktan sonra eski sevgilinin arkadaşlarını takipten çıkmak","Eski sevgiliye terfi tebriği göndermek","Ayrılığı arkadaşlar aracılığıyla bildirmek","Eski sevgilinin yeni sevgilisiyle arkadaş olmak","Ayrılmak için “uygun zamanı” aylarca beklemek","Ayrılıktan sonra ortak arkadaşların doğum gününe gitmemek","Eski sevgilinin seni rüyasında gördüğünü söylemesi","Eski sevgilinin seni yeni sevgilisiyle kıyaslaması","Ayrılınca çift dövmesini kapattırmak","Ayrılıktan sonra “intikam fotoğrafı” paylaşmak","Ayrılıktan sonra bilerek onun mahallesinden geçmek","Ayrılınca hediye kutusunu kapısına bırakmak","Ayrılınca yeni sevgilini eski mekânınıza götürmek","Ayrılınca eski sevgilinin ailesine veda mesajı atmak","Barışmak için ortak arkadaşı aracı yapmak","Barışınca ilişkiyi sosyal medyada yeniden duyurmak","Üçüncü kez ayrılıp barışmak","Ayrılıktan sonra onun tarifleriyle yemek yapmaya devam etmek","Ayrılıktan sonra ortak fotoğrafları kırparak kullanmak"
+  ]},
+  { id: "kaos", name: "🎲 Tamamen Kaos", items: [
+    "Sevgiliye yapay zekâya aşk mektubu yazdırmak","Kahve falında çıkan “esmer biri”ye takılmak","Sevgiliyle eşleşen dövme yaptırmak","Sevgilinin adını vücuduna dövme yaptırmak","Sevgiliyle aynı renge saç boyatmak","Kavgayı yapay zekâya sorup haklı çıkmak","Sevgilinin kedisinden daha az ilgi görmek","İlişkiyi burç uyumsuzluğu yüzünden bitirmek","Sevgiliyle maddeli ilişki sözleşmesi yazmak","Sevgilinin evine diş fırçası bırakıp yer işaretlemek","Her ay “aylık dönüm” kutlaması yapmak","İlk büyük kavgayı mobilya mağazasında etmek","Sevgilinin önce oyuna, sonra sana zaman ayırması","Sevgiliye flash mob ile sürpriz yapmak","Stadyum ekranında evlilik teklif etmek","Sevgiliyle ilişki podcast’i açmak","Sevgilinin seni fotoğraflarda hep kırpması","“Kim daha çok seviyor” yarışması yapmak","İlk “seni seviyorum”u yanlışlıkla söylemek","Sevgilinin seni falcıya götürüp ilişkiye baktırması","İlişkiyi yapay zekâya analiz ettirmek","İlk buluşmayı her yıldönümünde rol yaparak tekrarlamak","Sevgiliye kendi yüzünün basılı olduğu yastık hediye etmek","Sevgiliyle aynı gün bütün sosyal medyayı silmek","Sevgiliye her sabah rüya raporu vermek","Nişan ve düğünü aynı gün yapmak","Sevgiliyle ortak e-posta adresi açmak","Yıldönümünü pasta yerine dürümle kutlamak","İlişkiyi Excel tablosunda puanlamak","Sevgiliye yemek adı lakap takmak","Sevgiliyle eşleşen pijamaları her gece giymek","Sevgilinin alarmını kendi sesinle kaydetmek","İlişki kararlarını yazı tura ile vermek","Her kavgadan sonra eve bir bitki almak","Sevgiliyle ilk tanıştığınız yere her yıl çiçek bırakmak"
+  ]},
+  { id: "arkadaslik", name: "🤝 Arkadaşlık", items: [
+    "Arkadaşının sevgilisini beğenmediğini ona söylemek","Grup sohbetinde mesajı görüp cevap vermemek","Arkadaşının doğum gününü ancak telefon hatırlatınca kutlamak","Arkadaşına borç verip hatırlatmaya utanmak","Arkadaş grubunda ikinci bir gizli WhatsApp grubu kurmak","Arkadaşının sırrını sevgiline anlatmak","Planı son 10 dakikada iptal etmek","Arkadaşına kıyafet ödünç verip geri istememek","Arkadaşının ödünç aldığı kitabı yıllarca geri vermemesi","En yakın arkadaşının senin eski sevgilinle arkadaş kalması","Arkadaşının evlenirken seni sağdıç ya da nedime seçmemesi","Arkadaş grubunda hesabı “ben hallederim” deyip sonra IBAN atmak","Arkadaşının kötü çıktığı fotoğrafı ona sormadan paylaşmak","Arkadaşına “sana bir şey söyleyeceğim ama kızma” diye başlamak","Arkadaşın yüzünden bir kavgaya karışmak","Arkadaşına iş bulup sonra pişman olmak","Arkadaşınla ortak iş kurmak","Arkadaşınla aynı evde yaşamak","Ev arkadaşının yemeğini sormadan yemek","Ev arkadaşının sevgilisinin sürekli evde kalması","Arkadaşına “geliyorum” deyip yarım saat sonra evden çıkmak","Arkadaşının dertli sesli mesajlarını saatlerce dinlemek","Arkadaşının 7 dakikalık sesli mesajını 2x hızda dinlemek","Arkadaş grubunun buluşmasını hep aynı mekânda yapmak","Arkadaşının yeni sevgilisini grup tatiline getirmesi","Arkadaşının kötü şarkı söyleyişini övmek","Arkadaşına doğum gününde sadece story etiketi atmak","Artık hiçbir ortak noktanız olmasa da çocukluk arkadaşınla görüşmeye devam etmek","Arkadaşının yanında başka bir arkadaşını övmek","Arkadaşın taşınırken “işim var” demek","Arkadaşının düğününe davetsiz bir +1 getirmek","Arkadaşının bebek fotoğraflarına her seferinde “maşallah” yazmak","Arkadaşınla aynı kişiden hoşlanmak","Arkadaşına sevgilisinin onu aldattığını söylemek","Arkadaşının sevgilisini aldattığını bilip susmak","Arkadaşın işsizken hesabı hep senin ödemen","Arkadaş buluşmasına sevgilinle gelip sadece onunla konuşmak","Arkadaşının ödünç aldığı arabayı benzinsiz geri getirmesi","Yemeğe başlamak için arkadaşının fotoğraf çekmesini beklemek","Arkadaşınla girdiğin iddiayı kaybedince “unutmak”","Arkadaşının çocuğunu onun yanında azarlamak","Arkadaşın tatildeyken seni hiç aramaması","Arkadaşına dürüstçe “bu saç sana olmamış” demek","Arkadaşının aldığı hediyeyi beğenmediğini belli etmek","Arkadaşına telefonunu kilidi açık ödünç vermek","Arkadaşının Netflix profilini kullanıp izleme geçmişini karıştırmak","Arkadaşına her ay “bir kahve içelim” deyip hiç içmemek","Arkadaşını kendi yeni arkadaş grubuna sokmak","Arkadaşının arkasından konuşulurken susmak","Diğerleri sevmiyor diye gruptaki birini dışlamak","Arkadaşının sana hiç soru sormadan sadece kendinden bahsetmesi","Arkadaşına sevgilisinden ayrılmasını tavsiye etmek","Arkadaşın eski sevgilisiyle barışınca “ben demiştim” demek","Arkadaşınla aynı gün aynı kıyafeti giymek","Arkadaşının sınavda senden kopya istemesi","Arkadaşına referans olup onu olduğundan iyi anlatmak","Ortak hediyeye para vermeyip doğum günü kartına imza atmak","Arkadaşının kedisine bakmayı kabul edip unutmak","Arkadaşın tatildeyken sulaman gereken çiçeklerini kurutmak","Arkadaşına gece 3’te “uyanık mısın?” yazmak","Arkadaşını gece yarısı havalimanından almaya gitmek","Arkadaşının yanındayken telefona gömülmek","Arkadaşınla sadece dedikodu için buluşmak","Arkadaşının kariyer başarısını içten kutlayamamak","Arkadaşının saçma iş fikrine para yatırmak","Arkadaş grubunun hep organizatörü olmaktan bıkıp bırakmak","Arkadaşının evine gelince ayakkabılarını çıkarmaması","Arkadaşının evinde buzdolabını sormadan açmak","Arkadaşının evinde habersiz sabahlamak","Arkadaşına sürpriz parti yapıp onun bundan nefret etmesi","Arkadaşınla küsünce ortak arkadaşlara taraf seçtirmek","Arkadaşının paylaşımını dalga geçmek için başka gruba atmak","Arkadaşının yeni tarzını birebir taklit etmek","Arkadaşının ilişkisine karışmak","Arkadaşının nişanlısıyla aranın hiç iyi olmaması","Arkadaşına aynı fıkrayı beşinci kez anlatmak","Arkadaşına verdiğin borcu sessizce hediye saymak","Arkadaşlarla maç izlerken karşı takımı tutmak","Arkadaşına futbol yüzünden bir hafta küsmek","Arkadaşınla yıllardır planlanan ortak tatile hiç gitmemek","Arkadaşının ayrılık acısını aylarca dinlemek","Arkadaşına taşınmada yardım edip karşılığında pizza beklemek","Arkadaşının doğum gününe sadece “iyi ki doğdun” yazması","Arkadaşına aslında kendi istediğin şeyi hediye almak","Arkadaşına söz verip son anda gelmemek","Arkadaşına ilişki tavsiyesi verirken kendi ilişkini batırmak","Arkadaşının ödünç aldığı şarj aletini asla geri vermemesi","Arkadaşınla aynı iş ilanına başvurmak","Arkadaşının çocuğunun manevi teyzesi ya da amcası olmak","Arkadaşının seni sadece işi düşünce araması","Arkadaş grubunda bir kişinin her seferinde geç kalması","Arkadaşının her buluşmaya sevgilisini getirmesi","Arkadaşınla online oyunda birbirinize bağırmak","Arkadaşının yazdığı şiiri “güzel olmuş” diye geçiştirmek","Arkadaşının yemeğini beğenmeyip “çok doydum” demek","Yıllar önceki bir sırrı arkadaşına şimdi itiraf etmek","Lise arkadaşlarıyla 10. yıl buluşmasına gitmek","Eski bir arkadaşın yıllar sonra arayıp ağ pazarlaması fırsatı sunması","Arkadaşından “yatırım” diye borç istemek","Arkadaşınla kafede dört saat oturup tek çay içmek","Hesap gelince arkadaşınla yemekte tuvalete kalkmak","Arkadaşının yeni sevgilisinin seninle flört etmesi","Arkadaşına sevgilisinin seninle flört ettiğini söylemek","Grup fotoğraflarından sadece kendinin iyi çıktığını paylaşmak","Arkadaşının seni fotoğraflarda hep kenarda bırakması","Arkadaşına “sen çok değiştin” demek","Arkadaşının evlenince ortadan kaybolması","Arkadaşının çocuğu olunca sadece bebekten bahsetmesi","Arkadaşınla beraber diyete başlayıp o bırakınca ona küsmek","Arkadaşınla spor salonuna yazılıp sadece ilk gün gitmek","Arkadaşının konserinde ön sırada uyuklamak","Arkadaşının projesini dürüstçe eleştirmek","Arkadaşının ilişki problemlerini grup sohbetine taşımak","Grup sohbetindeki 400 okunmamış mesajı okumadan kaydırmak","Arkadaşının ayrılığını ondan önce sosyal medyadan öğrenmek","Arkadaşınla tatilde aynı yatağı paylaşmak","Tatilde arkadaşın horladığı için oda değiştirmek","Arkadaşının doğum gününde 00.00’da ilk mesajı atmak için uyanık kalmak","Arkadaşınla her gün mesajlaşmak zorunda hissetmek","Arkadaşının yeni iş arkadaşlarından fazla bahsetmesini kıskanmak","Yeni arkadaşlar edinince eski grubu ihmal etmek","Arkadaşının senin numaranı sana sormadan birine vermesi","Arkadaşını tanımadığı biriyle eşleştirmeye çalışmak","Eşleştirdiğin çift ayrılınca suçun sana kalması","Arkadaşınla sürekli “kim daha başarılı” yarışı yapmak","Arkadaşının ödünç kıyafetini lekeli geri getirmek","Arkadaşını story’lerinden gizlemek","Arkadaşını “yakın arkadaşlar” listesinden çıkarmak","Arkadaşının seni yeni kurduğu gruba eklememesi","Arkadaşının doğum günü partisine iki saat geç gitmek","Arkadaşına “hediyen tatil” deyip hiç götürmemek","Arkadaşının hatasını yüzüne açık açık söylemek","Arkadaşına hayat dersi vermeye çalışmak","Arkadaşını kırmamak için yalan iltifat etmek","Arkadaşının düğün konuşmasında utanç verici anısını anlatmak","Arkadaşından siyasi görüşü yüzünden uzaklaşmak","Arkadaşınla birlikte yurt dışına taşınma sözü verip tek başına gitmek","Arkadaşın şehir değiştirince görüntülü görüşmeyi bile bırakmak","Arkadaşının ailesiyle ondan daha iyi anlaşmak","Arkadaşının annesine “anne” demek","Arkadaşının evinde aile kavgasına denk gelip yemeğe devam etmek","Arkadaşının bütün şifrelerini bilmek","Arkadaşınla aynı dövmeyi yaptırmak","30 yaşında arkadaşlık bilekliği takmak","Arkadaşınla doğum gününü ortak kutlamak","Arkadaşının seni dizi önerileriyle bombardımana tutması","Arkadaşının önerdiği diziyi izlemeden “izledim, harikaydı” demek","Arkadaşınla yılda bir görüşüp kaldığınız yerden devam etmek","Arkadaşınla tartışmayı mesaj yerine yüz yüze çözmek","Arkadaşının “biz neden eskisi gibi değiliz?” mesajı atması","Arkadaşına kızıp story’den imalı paylaşım yapmak","Arkadaşına sevgilinden önce haber vermek","Arkadaşının ilk buluşmasını uzaktan izlemeye gitmek","Arkadaşın için onun eski sevgilisini engellemek","Arkadaşına sevgilinin sırlarını anlatmak","Arkadaşını telefonda “Kanka 2” diye kaydetmek","Arkadaşının bütün sorunlarına “boşver” diye cevap vermek","Arkadaşınla aynı anda aynı mesajı başka kişilere atmak","Arkadaş grubunda herkesin her şeyden haberdar olması","Arkadaşının kötü arabasını sürmesine izin vermek"
+  ]},
+  { id: "isyeri", name: "💼 İş Yeri", items: [
+    "Patronla sosyal medyada arkadaş olmak","İş arkadaşına maaşını söylemek","İş arkadaşının maaşını öğrenmeye çalışmak","Ofiste mikrodalgada balık ısıtmak","Ofis buzdolabından başkasının yoğurdunu yemek","Kamera kapalı toplantıda uyumak","Toplantıda “sesim geliyor mu?” diye 5 dakika harcamak","Mail ile halledilecek işi bir saatlik toplantıya çevirmek","Cuma 17.55’te iş göndermek","Mesai dışında WhatsApp’tan iş yazmak","İş arkadaşının fikrini toplantıda kendi fikrin gibi anlatmak","Patronun esprisine zorla gülmek","Ofiste doğum günü için herkesten para toplamak","Hiç konuşmadığın iş arkadaşının doğum günü pastasından iki dilim yemek","İş yerinde sevgili olmak","Ofis romansını herkesten saklamak","İş arkadaşlarının ofis aşkını ilk fark edip yaymak","İş arkadaşını yöneticiye şikâyet etmek","Ofiste her soruya “çok yoğunum” demek","Öğle yemeğinde iş konuşmak","Öğle yemeğine hep aynı kişilerle gitmek","Yeni gelen çalışanı öğle yemeğine çağırmamak","Aynı yaştaki iş arkadaşına “abi” ya da “abla” demek","Patrona “hocam” demek","Hastayken işe gelip herkesi hasta etmek","Hasta değilken rapor almak","Evden çalışırken pijama altıyla toplantıya girmek","Toplantı sırasında çamaşır asmak","Çevrimiçi görünmek için faresini sürekli oynatmak","Ekip grubunda her şeye tek emojiyle cevap vermek","Mailin sonuna “saygılarımla” yerine “sevgiler” yazmak","Her maile herkesi CC’ye eklemek","“Tümünü yanıtla” ile sadece “teşekkürler” yazmak","İş arkadaşının masasından kalemini almak","Ofiste kulaklıkla çalışıp kimseyle konuşmamak","Ofiste yüksek sesle telefonda konuşmak","Ofis kliması için savaş açmak","İş saatinde LinkedIn’de iş aramak","İstifayı mesajla vermek","İstifa edip vedada herkese gerçek düşüncelerini söylemek","Ayrılan iş arkadaşının veda pastasını yiyip kartını imzalamamak","İş arkadaşlarıyla işten sonra içmeye gitmek","Ofis partisinde fazla eğlenip ertesi gün işe gelmemek","Yılbaşı hediye çekilişinde en ucuz hediyeyi almak","Çekilişte çıkan hediyeyi başkasına hediye etmek","Patrona doğum günü hediyesi almak","Yöneticinin hafta sonu araması","Tatildeyken iş maillerini kontrol etmek","İzin alırken sebebini uzun uzun açıklamak","Pazartesi geç gelip suçu trafiğe atmak","Mesai bitmeden 10 dakika önce çantayı toplamak","Kahve makinesindeki son kahveyi alıp yenisini koymamak","Ortak mutfakta bulaşığı lavaboda bırakmak","Terfi için patronla fazla samimi olmak","İş arkadaşının hatasını üstlenmek","Kendi hatanı iş arkadaşına yıkmak","Ekip yemeğinde hesabı eşit bölmek","İş arkadaşına borç vermek","İş arkadaşının özel hayatını dedikodu yapmak","Ofis dedikodu grubunda olmak","Patron hakkındaki mesajı yanlışlıkla ekip grubuna atmak","Toplantıda sürekli telefona bakmak","“Hızlıca geçeceğim” deyip 40 dakika sunum yapmak","Stajyere kahve yaptırmak","Kendinden 10 yaş küçük yöneticiye rapor vermek","İş arkadaşının parfümünün bütün ofisi kaplaması","Ofiste ayakkabı çıkarmak","Masada kokulu öğle yemeği yemek","Ekran paylaşımında yanlışlıkla kişisel sekmeni göstermek","Mesai saatinde Instagram’da gezinirken patrona yakalanmak","Patronun mailindeki yazım hatasını düzeltmek","Takım projesinde hiçbir şey yapmayıp sunumu sen yapmak","Toplantıda susup sonra mailde itiraz etmek","“Bunu ayrıca konuşalım” deyip hiç konuşmamak","İş arkadaşlarıyla birlikte tatile gitmek","Ayrıldığın eski iş yerine geri dönmek","Rakip şirkete geçip eski ekipten adam çekmek","Mülakatta zayıf yönüne “mükemmeliyetçiyim” demek","Özgeçmişte İngilizceyi “ileri seviye” yazmak","Beğenmediğin iş arkadaşına LinkedIn’de övgü yazmak","İş arkadaşının düğününe gitmek zorunda hissetmek","Ekip WhatsApp grubundan sessizce çıkmak","İş arkadaşına iş dışında hiç yazmamak","Patronla aynı spor salonuna gitmek","Ofiste ayrıldığın sevgilinle aynı odada çalışmaya devam etmek","Yöneticinle flört etmek","Mesai saatinde kişisel alışveriş yapmak","Şirket kalemlerini eve götürmek","Ofisteki kişisel kupanın başkası tarafından kullanılması","Yazıcının kâğıdı bitince koymadan gitmek","İşe ilk hafta masaya sevgili fotoğrafı koymak","Ekip toplantısında herkes kameradayken kamerayı açmamak","Ofisteki bitkiyi kimin sulayacağı tartışması","Her pazartesi “hafta sonu ne yaptın?” diye sormak","Zam için başka şirketten teklif alıp pazarlık yapmak","Patrona açıkça “hayır” demek","Mesai sonrası iş yemeklerine hiç katılmamak","Ofiste bir kişinin her şeye “ben söylemiştim” demesi","İşte çok samimi olup işten ayrılınca hiç görüşmemek","İş arkadaşınla ev arkadaşı olmak","İş arkadaşının senin hakkında yöneticiye konuşması","Yöneticinin seni herkesin önünde eleştirmesi","Yöneticini toplantıda herkesin önünde düzeltmek","Performans değerlendirmesinde kendine 10 üzerinden 10 vermek","Ekipte bir kişinin hiç mail okumaması","Toplantılara hep 5 dakika geç girmek","Ofis doğum günü kutlamalarına hiç katılmamak","İş yerinde kendi doğum gününü saklamak","Ofise köpek getirmek","Ofiste masa başında makyaj yapmak","Ofiste hoparlörden müzik açmak","Ofis buzdolabındaki yemeğe isim yazmak","Yeni gelen arkadaşa şirket dedikodularını ilk gün anlatmak","Ofisin “annesi” ya da “babası” rolünü üstlenmek","Uzaktan çalışırken başka bir şehirden çalıştığını söylememek","İş arkadaşının senin kıyafet tarzını kopyalaması","İş arkadaşına sevgili ayarlamaya çalışmak","İş arkadaşının sevgilisini ofis partisine getirmesi","Patronun eşinin şirket işlerine karışması","Aile şirketinde çalışmak","Akrabanın şirketine torpille girmek","Arkadaşını kendi şirketine önermek","Önerdiğin arkadaşın işi batırması","Ekip arkadaşının işini sessizce düzeltip söylememek","Her şeye “evet” diyen iş arkadaşına fazla iş yıkmak","Mesai dışı aramalara cevap vermemek","Hasta izindeki iş arkadaşını iş sorusuyla aramak","Şirket paintball etkinliğinde patrona acımamak","Şirket maçında yöneticiye faul yapmak","Şirket gezisinde iş arkadaşıyla aynı odada kalmak","Ofisteki ortak kahveye para vermeyip içmek","Uzayan toplantıda “son bir soru” diye söz almak","İş arkadaşının her gün bebek fotoğrafı göstermesi","Yöneticinle aynı hafta izne çıkmak","Bayram öncesi herkes izindeyken ofiste tek kalmak","Kahve molasında siyasi tartışma açmak","Hatayı çözmeden önce kimin yaptığını bulmaya çalışmak","Sigara içmediğin halde sigara molalarına katılmak","Mülakatta “beş yıl sonra kendini nerede görüyorsun?” sorusuna “sizin yerinizde” demek","Kovulmayı bekleyip istifa etmemek","İş arkadaşına “bu senin işin değil mi?” demek","Toplantıda başkasının sözünü kesmek","Ekip grubuna gece yarısı fikir atmak","İş arkadaşının yemeğinden “tadına bakmak”","Patrondan gelen maile 3 dakikada, iş arkadaşından gelene 3 günde cevap vermek","Ofiste ayakta çalışma masası isteyip hiç kalkmamak","İş arkadaşının senin hakkında LinkedIn’de yorum yapması","İşten ayrılırken veda maili yazmak","Ofiste kendi yerine başkasının oturması","İş arkadaşına “müsait misin?” yazıp sorunu söylememek"
+  ]},
+  { id: "akraba", name: "🧓 Akrabalar", items: [
+    "Bayramda “ne zaman evleniyorsun?” sorusuna cevap vermemek","Akrabaların maaşını sorması","Teyzenin “kilo almışsın” demesi","Halanın seni biriyle evlendirmeye çalışması","Akraba düğününde takıyı takıp erkenden çıkmak","Kuzeninle aynı yerde çalışmak","Kuzenine borç vermek","Yetişkinken bayram harçlığı beklemek","Akraba ziyaretini 15 dakikada bitirmek","Aile grubundaki “günaydın” mesajlarını sessize almak","Aile grubunda paylaşılan sahte haberi düzeltmek","Dayının sofrada siyasi tartışma açması","Akrabaların seni kuzeninle kıyaslaması","Akraba çocuğunu tabletle susturmak","Akraba çocuğu odanı dağıtınca kızmak","Akrabalar gelince evde yokmuş gibi yapmak","Habersiz gelen akrabaya “tam çıkıyorduk” demek","Miras konusunu açıkça konuşmak","Mirasta bir çay takımı için kavga etmek","Akraba cenazesinde telefonla oynamak","Kuzeninle düğünde aynı kıyafeti giymek","Teyzenin her söylediğine “sen bilirsin teyzeciğim” demek","Yeğenine çok pahalı hediye almak","Yeğenini sevip ailesini sevmemek","Kayınbiraderle ortak iş yapmak","Eniştenin her yemekte aynı hikâyeyi anlatması","Aile toplantısında sürekli telefonla ilgilenmek","Anneannenin tarifini değiştirmek","Bayram sofrasında diyette olduğunu söylemek","Akrabaların seni sosyal medyada takip etmesi","Akrabaları Instagram’da kısıtlamak","Teyzenin her fotoğrafına uzun yorumlar yazması","Akrabaların ilişkine yorum yapması","Kuzeninin eski sevgilisiyle çıkmak","Kuzenine en sevdiğin kıyafetini ödünç vermek","Yetişkinken kardeşinle aynı odayı paylaşmak","Kardeşinin sırrını annene söylemek","Kardeşinin sevgilisi olduğunu ailene ilk senin söylemen","Büyük kardeşin her şeye karışması","Küçük kardeşin hep kayırılması","Kardeşinin arkadaşıyla sevgili olmak","Kardeşine verdiğin borcu hiç geri istememek","Babana gerçek maaşını söylememek","Annene bütün sorunlarını anlatmak","Annenin günde üç aramasını sessize almak","Bütün aile organizasyonlarının tek bir kişiye kalması","Bayramda akraba ziyareti yerine tatile gitmek","Bayram ziyaretini telefonla geçiştirmek","Yılbaşını aile yerine arkadaşlarla geçirmek","Dedenin askerlik anılarını onuncu kez dinlemek","Anneannenin evine tok gitmek","Halanın yemeğine “doydum” demek","Akraba düğününde halaya kalkmamak","Akraba düğününde fazla içip sahneye çıkmak","Akraba cenazesinde eski küslüklerin ortaya çıkması","Yıllardır küs olduğun akrabayla bayramda barışmak","Bir akrabanın borcunu hiç ödememesi","Akrabana kredi için kefil olmak","Akraba çocuğuna bedava özel ders vermek","Akrabanın çocuğu için senden torpil istemesi","Doktor akrabana her hastalığı sormak","Avukat akrabadan bedava danışmanlık istemek","Bilgisayardan anlayan akrabaya her bozulan cihazı getirmek","Akrabanın kombisini tamir etmeye çağrılmak","Akraba evine bavulla gelip bir hafta kalmak","Akraba evinde kalırken hiç yardım etmemek","Akrabaların çocukken yaptığın utanç verici şeyi her bayram anlatması","Bebeklik fotoğraflarının aile grubunda paylaşılması","Aile grubuna 4 dakikalık sesli mesaj atmak","Aile grubuna sevgilinle fotoğraf atmak","Aile tatiline sevgilini götürmek","Hiç tanımadığın uzak akrabanın düğününe gitmek","Akrabaların “biz senin yaşındayken iki çocuğumuz vardı” demesi","Akrabalara meslek seçiminin hesabını vermek","Akrabaların hangi bölümü okuyacağına karışması","Kuzenlerle sınav puanlarının kıyaslanması","Akraba çocuklarına harçlık vermemek","Bayramda şeker yerine çikolata ikram etmek","Akrabanın yeni arabasını övmek zorunda kalmak","Ailenin yazlığını kullanıp dağınık bırakmak","Yazlıkta hangi kardeşin hangi ay kalacağına kavga etmek","Annenin evini habersiz gelip temizlemesi","30 yaşında anne babayla yaşamaya devam etmek","Evden ayrılınca kirli çamaşırları annene getirmek","Annenin yemek kaplarını hiç geri götürmemek","Ailenin seni hâlâ çocuk gibi görmesi","Annenin sevgilinin sosyal medyasını incelemesi","Babanın sevgiline sert konuşması","Kayınpederle derbi izlemek","Kayınvalideye yemek tarifi sormak","Kayınvalideye yemek tarifi öğretmek","Görümcenin evliliğe karışması","Eltinle yarışmak","Akrabaların senin yerine düğün planı yapması","Ailenin düğün davetli listesini 400 kişiye çıkarması","Bazı akrabalara düğün davetiyesi göndermemek","Kuzen düğününde takılan altınları not etmek","Takılan altın miktarını aile içinde konuşmak","Dedenin 80 yaşında yeniden evlenmesi","Dul anne ya da babanın yeniden evlenmesine karşı çıkmak","Babaannenin torunlar arasında ayrım yapması","Akrabaların her bayram sizin evde toplanması","Akraba ziyareti için evi baştan aşağı temizlemek","Akraba gelince en iyi fincan takımını çıkarmak","Akraba ziyaretinde sürekli saate bakmak","Akrabanın senin hakkında annene dedikodu yapması","Anneanneye sevgilin olduğunu söylemek","Anneanneye dövmeni göstermek","Akrabaların yanında sigara içmemek","Teyzenin bakacağı kahve falına göre karar vermek","Aile grubunda konum paylaşmak","Kardeşinle ortak ev almak","Kardeşinin eşini sevmemek","Kardeşinle yıllarca konuşmamak","Kardeşinin çocuğuna senin adının konulması","Kardeşinin çocuğuna her hafta bakmak zorunda kalmak","Yeğene şaka diye yaramazlık öğretmek","Ailenin sana akraba evliliği önermesi","Bayram tatilini hiçbir akrabaya gitmeden evde geçirmek","Akraba evine eli boş gitmek","Akrabanın tarifindeki “gizli malzemeyi” kimseye söylememesi","Hastanedeki akrabayı ziyaret etmemek","Yurt dışından dönünce her akrabaya hediye getirmek zorunda hissetmek","Gurbetçi akrabaların her yaz sizde kalması","Akrabanın arabanı ödünç alması","Akrabanın arabanı çizip söylememesi","Kuzenlerle her yıl ortak tatil yapmak","Akrabayla siyasi tartışmada masadan kalkmak","Akraba çocuğunun doğum gününe gitmemek","Akrabayı sosyal medyada engellemek","Uzun zamandır görmediğin akrabanın adını hatırlamamak","Kuzeninin seni düğününe çağırmaması","Teyzenin seni herkesin önünde “hâlâ bekâr” diye tanıtması","Akrabaların ev fiyatını sorması","Aile yemeğinde kimin bulaşık yıkayacağı savaşı","Kuzeninle yarışarak büyümek","Amcanın her konuda “bizim zamanımızda” demesi","Akrabanın sana hayat sigortası satmaya çalışması","Akraba düğününde masaya isim kartı konulmaması","Otuz yaşında akraba düğününde çocuk masasına oturtulmak"
+  ]}
+];
+
+const SPECIAL_NAME = "😏 Ahmet’in Çapkınlık Dosyası";
+const SPECIAL = [
+  "Ahmet’in aynı akşam üç farklı kişiye “sen bambaşkasın” yazması","Ahmet’in her düğünde nedimelerin masasına “yanlışlıkla” oturması","Ahmet’in tanışma uygulamasına “ciddi ilişki arıyorum” yazıp herkesle eşleşmesi","Ahmet’in garsondan hesapla birlikte telefon numarası da istemesi","Ahmet’in her yeni flörtüne aynı restoranı “benim gizli mekânım” diye tanıtması","Ahmet’in rehberinde “Zeynep Kafe”, “Zeynep Spor”, “Zeynep Düğün” diye üç kayıt olması","Ahmet’in “ben aslında çok romantiğimdir” deyip ikinci buluşmaya gelmemesi","Ahmet’in her story’ye kalp atıp sonra “parmağım kaydı” demesi","Ahmet’in eski sevgililerinin kendi aralarında WhatsApp grubu kurmuş olması","Ahmet’in tatilde her akşam başka biriyle gün batımı fotoğrafı çekmesi","Ahmet’in “kardeş gibiyiz” dediği herkesle flört etmesi","Ahmet’in ayrılık mesajını kopyala-yapıştır ile atması","Ahmet’in isim karıştırmamak için herkese “bebeğim” demesi","Ahmet’in “bu sefer ciddiyim” cümlesini yılda dört kez kurması","Ahmet’in markette kasiyerle numara alışverişi yapması","Ahmet’in eski sevgilisinin kuzeniyle çıkması","Ahmet’in aynı hafta iki ayrı kişiye aynı şarkıyı ithaf etmesi","Ahmet’in “Casanova” lakabıyla gurur duyması","Ahmet’in arkadaşının düğününde gelinin arkadaşlarından numara toplaması","Ahmet’in evlenince çapkınlığı bırakacağına yemin etmesi","Ahmet’in parfümünü buluşmaya göre seçip buna “strateji” demesi","Ahmet’in her yeni ilişkiyi “kaderimizde vardı” diye başlatması","Ahmet’in bir buluşmayı iptal edip aynı saatte başka buluşmaya gitmesi","Ahmet’in her tanışmaya “seni bir yerden tanıyorum” diye başlaması","Ahmet’in Instagram’da 2000 kişiyi takip edip hepsine beğeni atması","Ahmet’in tanışma uygulamasında konumunu üç şehre değiştirmesi","Ahmet’in sevgilisinin doğum gününü başka birininkiyle karıştırması","Ahmet’in her düğünde “sıra bende” deyip hiç evlenmemesi","Ahmet’in her yeni flörtüne aynı şiiri göndermesi","Ahmet’in spor salonunda antrenmandan çok sohbet etmesi","Ahmet’in telefonu masaya hep ekranı aşağı koyması","Ahmet’in “gece arayan kimdi?” sorusuna “bankadan” demesi","Ahmet’in aynı mekânda iki ayrı masada iki ayrı buluşma yapması","Ahmet’in eski sevgilisinin en yakın arkadaşına mesaj atması","Ahmet’in her tatilden yeni bir “tatil aşkı” hikâyesiyle dönmesi","Ahmet’in buluşmalar yüzünden ayda 8 kez berbere gitmesi","Ahmet’in profil fotoğrafını haftada üç kez değiştirmesi","Ahmet’in aşk acısını en fazla iki gün çekmesi","Ahmet’in herkese “senin gibisini ilk kez görüyorum” demesi","Ahmet’in bütün eski sevgililerinin doğum gününü hâlâ kutlaması","Ahmet’in arkadaşlarının yeni flörtünün adını sormaktan vazgeçmesi","Ahmet’in “sadece arkadaşız” dediği beş ayrı kişi olması","Ahmet’in garsona iltifat edip indirim istemesi","Ahmet’in düğün davetiyesine “+3” yazması","Ahmet’in yılbaşı mesajını 40 kişiye ayrı ayrı “sadece sana” diye atması","Ahmet’in çapkınlığını “ben sosyal kelebeğim” diye savunması","Ahmet’in sevgilisinin arkadaşlarıyla fazla samimi olması","Ahmet’in her ayrılıktan sonra yeni bir parfüme geçmesi","Ahmet’in “ne zaman evleniyorsun?” sorusuna “seçemiyorum” demesi","Ahmet’in bu oyunda kendi kartları gelince hepsine OK demesi"
+];
+
+// global card numbers 1..N
+let n = 0;
+const ALL = [];
+CATS.forEach(c => c.items.forEach(q => ALL.push({ id: ++n, cat: c.id, catName: c.name, q })));
+
+const $ = id => document.getElementById(id);
+const card = $("card"), actions = $("actions");
+let selected = new Set(CATS.map(c => c.id));
+let deck = [], current = null, ok = 0, nok = 0, played = 0, skipped = 0, total = 0, started = false;
+let specials = [], sinceSpecial = 0, nextSpecialAt = 20;
+const nextGap = () => 18 + Math.floor(Math.random() * 5);
+
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function buildDeck() {
+  deck = shuffle(ALL.filter(x => selected.has(x.cat)));
+  total = deck.length; ok = 0; nok = 0; played = 0; skipped = 0; current = null;
+  specials = shuffle(SPECIAL.map(q => ({ special: true, catName: SPECIAL_NAME, q })));
+  sinceSpecial = 0; nextSpecialAt = nextGap();
+  updateScore();
+}
+
+function renderChips() {
+  const all = selected.size === CATS.length;
+  const html = [`<button type="button" class="chip" id="chip-all" aria-pressed="${all}">Hepsi · ${ALL.length}</button>`]
+    .concat(CATS.map(c => `<button type="button" class="chip" id="chip-${c.id}" data-id="${c.id}" aria-pressed="${!all && selected.has(c.id)}">${c.name} · ${c.items.length}</button>`));
+  $("chips").innerHTML = html.join("");
+}
+
+$("chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  const all = selected.size === CATS.length;
+  if (!b.dataset.id) selected = new Set(CATS.map(c => c.id));
+  else {
+    const id = b.dataset.id;
+    if (all) selected = new Set([id]);
+    else if (selected.has(id)) { selected.delete(id); if (!selected.size) selected = new Set(CATS.map(c => c.id)); }
+    else selected.add(id);
+  }
+  renderChips(); buildDeck(); started ? draw() : showStart();
+});
+
+function updateScore() {
+  $("okN").textContent = ok; $("nokN").textContent = nok;
+  $("left").textContent = `${Math.max(total - played, 0)} / ${total} kart kaldı`;
+}
+
+function showStart() {
+  card.className = "card start";
+  card.style.transform = ""; card.style.opacity = "";
+  card.innerHTML = `<p class="big">${total} kaotik kart karıştırıldı: aşk, arkadaşlık, iş yeri ve akrabalar karışık geliyor.</p>
+    <p>Kartı çek, soruyu yüksek sesle oku, herkes aynı anda “OK!” ya da “NOK!” diye bağırsın. Çoğunluk kazanır, azınlık kendini savunur.</p>
+    <p>Kartı sağa kaydır OK, sola kaydır NOK. Arada bir sarı kart gelirse: Ahmet’in çapkınlık dosyası açıldı demektir.</p>`;
+  actions.innerHTML = `<button type="button" class="btn draw" id="drawBtn">Kart çek</button>`;
+  $("drawBtn").onclick = () => { started = true; draw(); };
+}
+
+function showEnd() {
+  current = null;
+  const t = ok + nok || 1, okP = Math.round(ok / t * 100);
+  const verdict = ok === nok ? "Tam ortadan ikiye bölündünüz." : ok > nok ? "Bu masa her şeye OK diyor. Bayağı rahatsınız." : "NOK’lar kazandı. Bu masada standartlar yüksek.";
+  card.className = "card end";
+  card.style.transform = ""; card.style.opacity = "";
+  card.innerHTML = `<p class="big">Deste bitti!</p>
+    <div class="bar" aria-hidden="true"><span style="width:${okP}%;background:var(--ok)"></span><span style="width:${100 - okP}%;background:var(--nok)"></span></div>
+    <p><b style="color:var(--ok)">${ok} OK</b> · <b style="color:var(--nok)">${nok} NOK</b> · ${skipped} atlandı</p>
+    <p>${verdict}</p>`;
+  actions.innerHTML = `<button type="button" class="btn draw" id="againBtn">Yeniden karıştır</button>`;
+  $("againBtn").onclick = () => { buildDeck(); draw(); };
+}
+
+function draw() {
+  if (!deck.length) { showEnd(); return; }
+  if (sinceSpecial >= nextSpecialAt && specials.length) {
+    current = specials.pop(); sinceSpecial = 0; nextSpecialAt = nextGap();
+  } else { current = deck.pop(); sinceSpecial++; }
+  card.className = current.special ? "card special" : "card";
+  card.style.transition = "none";
+  card.style.transform = "translateY(24px) scale(.96)"; card.style.opacity = "0";
+  card.innerHTML = `<div class="card-top"><span class="cat">${current.catName}</span><span class="num">${current.special ? "ÖZEL" : "#" + String(current.id).padStart(3, "0")}</span></div>
+    <p class="q">${current.q}</p>
+    <div class="prompt"><span>← NOK</span><span>Ok mu? Nok mu?</span><span>OK →</span></div>
+    <span class="stamp ok" id="stOk">OK</span><span class="stamp nok" id="stNok">NOK</span>`;
+  void card.offsetWidth;
+  card.style.transition = ""; card.style.transform = ""; card.style.opacity = "";
+  actions.innerHTML = `<button type="button" class="btn nok" id="nokBtn">NOK</button>
+    <button type="button" class="btn skip" id="skipBtn">Atla</button>
+    <button type="button" class="btn ok" id="okBtn">OK</button>`;
+  $("nokBtn").onclick = () => decide("nok");
+  $("okBtn").onclick = () => decide("ok");
+  $("skipBtn").onclick = () => decide("skip");
+  updateScore();
+}
+
+let busy = false;
+function decide(v) {
+  if (!current || busy) return;
+  busy = true;
+  if (!current.special) played++;
+  if (v === "ok") ok++; else if (v === "nok") nok++; else skipped++;
+  updateScore();
+  const st = v === "ok" ? $("stOk") : v === "nok" ? $("stNok") : null;
+  if (st) st.classList.add("show");
+  const dx = v === "ok" ? 520 : v === "nok" ? -520 : 0;
+  setTimeout(() => {
+    card.style.transform = v === "skip" ? "translateY(-40px) scale(.94)" : `translateX(${dx}px) rotate(${dx / 20}deg)`;
+    card.style.opacity = "0";
+    setTimeout(() => { busy = false; draw(); }, 300);
+  }, st ? 380 : 0);
+}
+
+// swipe
+let sx = null, dxNow = 0;
+card.addEventListener("pointerdown", e => {
+  if (!current || busy) return;
+  sx = e.clientX; dxNow = 0; card.classList.add("dragging"); card.setPointerCapture(e.pointerId);
+});
+card.addEventListener("pointermove", e => {
+  if (sx === null) return;
+  dxNow = e.clientX - sx;
+  card.style.transform = `translateX(${dxNow}px) rotate(${dxNow / 18}deg)`;
+  const a = Math.min(Math.abs(dxNow) / 110, 1);
+  $("stOk").style.opacity = dxNow > 0 ? a : 0;
+  $("stNok").style.opacity = dxNow < 0 ? a : 0;
+});
+function endDrag() {
+  if (sx === null) return;
+  sx = null; card.classList.remove("dragging");
+  $("stOk").style.opacity = ""; $("stNok").style.opacity = "";
+  if (dxNow > 100) decide("ok");
+  else if (dxNow < -100) decide("nok");
+  else card.style.transform = "";
+}
+card.addEventListener("pointerup", endDrag);
+card.addEventListener("pointercancel", endDrag);
+
+document.addEventListener("keydown", e => {
+  if (e.target.closest && e.target.closest("button") && (e.key === " " || e.key === "Enter")) return;
+  if (!started && (e.key === " " || e.key === "Enter")) { e.preventDefault(); started = true; draw(); return; }
+  if (!current) return;
+  if (e.key === "ArrowRight") decide("ok");
+  else if (e.key === "ArrowLeft") decide("nok");
+  else if (e.key === " ") { e.preventDefault(); decide("skip"); }
+});
+
+$("reset").onclick = () => { buildDeck(); started ? draw() : showStart(); };
+
+renderChips(); buildDeck(); showStart();
+</script>
+
+</body>
+</html>
