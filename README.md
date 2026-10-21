@@ -18,6 +18,8 @@ Tek bir HTML dosyasıdır; kurulum, sunucu ya da kütüphane gerektirmez.
 | Kaydırma (telefon) | Sağa | Sola | — |
 | Klavye | → | ← | Boşluk |
 
+**🚩 RED FLAG** düğmesine (ya da klavyede **R** tuşuna) basınca ekran kırmızı siren ışıklarıyla yanar ve siren sesi çalar. Sayaç, oyunda kaç red flag yakalandığını tutar.
+
 ## Kategoriler
 
 | Kategori | Kart |
