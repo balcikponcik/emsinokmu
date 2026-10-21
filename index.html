@@ -70,10 +70,19 @@ h1 .ok { color: var(--ok); } h1 .nok { color: var(--nok); }
 .pill.nok { background: var(--nok-soft); color: var(--nok); }
 .pill b { font-family: var(--display); font-size: 17px; }
 
-.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-.chips::-webkit-scrollbar { display: none; }
+.cats { background: var(--card); border: 1.5px solid var(--card-edge); border-radius: 16px; }
+.cats summary {
+  list-style: none; cursor: pointer; padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 700; border-radius: 16px;
+}
+.cats summary::-webkit-details-marker { display: none; }
+.cats summary .sum { flex: 1; min-width: 0; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cats summary .arrow { flex: none; width: 9px; height: 9px; border-right: 2px solid var(--fg); border-bottom: 2px solid var(--fg); transform: translateY(-2px) rotate(45deg); transition: transform .2s; }
+.cats[open] summary .arrow { transform: translateY(2px) rotate(225deg); }
+.cats summary:focus-visible { outline: 3px solid var(--sticker); outline-offset: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
 .chip {
-  flex: none; border: 1.5px solid transparent; background: var(--chip); color: var(--fg); font: 500 13px var(--body);
+  flex: none; max-width: 100%; border: 1.5px solid transparent; background: var(--chip); color: var(--fg); font: 500 13px var(--body);
   border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap;
 }
 .chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
@@ -147,7 +156,10 @@ body { margin: 0; }
     </div>
   </header>
 
-  <div class="chips" id="chips" role="group" aria-label="Kategoriler"></div>
+  <details class="cats" id="catsBox">
+    <summary><span>Kategoriler</span><span class="sum" id="catSum">Hepsi</span><span class="arrow" aria-hidden="true"></span></summary>
+    <div class="chips" id="chips" role="group" aria-label="Kategoriler"></div>
+  </details>
 
   <div class="stage" id="stage">
     <div class="ghost g1"></div>
@@ -236,6 +248,7 @@ function renderChips() {
   const html = [`<button type="button" class="chip" id="chip-all" aria-pressed="${all}">Hepsi · ${ALL.length}</button>`]
     .concat(CATS.map(c => `<button type="button" class="chip" id="chip-${c.id}" data-id="${c.id}" aria-pressed="${!all && selected.has(c.id)}">${c.name} · ${c.items.length}</button>`));
   $("chips").innerHTML = html.join("");
+  $("catSum").textContent = all ? `Hepsi · ${ALL.length} kart` : CATS.filter(c => selected.has(c.id)).map(c => c.name.replace(/^\S+\s/, "")).join(", ");
 }
 
 $("chips").addEventListener("click", e => {
@@ -259,7 +272,8 @@ function updateScore() {
 function showStart() {
   card.className = "card start";
   card.style.transform = ""; card.style.opacity = "";
-  card.innerHTML = `<p class="big">${total} kaotik kart karıştırıldı: aşk, arkadaşlık, iş yeri ve akrabalar karışık geliyor.</p>
+  card.innerHTML = `<p class="big">${total} kaotik kart karıştırıldı.</p>
+    <p>Aşk, arkadaşlık, iş yeri ve akrabalar karışık geliyor. Sadece bazılarını oynamak için yukarıdaki Kategoriler menüsünü aç.</p>
     <p>Kartı çek, soruyu yüksek sesle oku, herkes aynı anda “OK!” ya da “NOK!” diye bağırsın. Çoğunluk kazanır, azınlık kendini savunur.</p>
     <p>Kartı sağa kaydır OK, sola kaydır NOK. Arada bir sarı kart gelirse: Ahmet’in çapkınlık dosyası açıldı demektir.</p>`;
   actions.innerHTML = `<button type="button" class="btn draw" id="drawBtn">Kart çek</button>`;
