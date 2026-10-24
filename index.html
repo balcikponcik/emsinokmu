@@ -134,13 +134,36 @@ h1 .ok { color: var(--ok); } h1 .nok { color: var(--nok); }
 .btn:disabled { opacity: .35; cursor: default; }
 .foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .foot button { background: none; border: 0; color: var(--muted); font: 500 13px var(--body); text-decoration: underline; cursor: pointer; padding: 0; }
-.redflag {
-  width: 100%; border: 2.5px solid var(--nok); background: var(--nok-soft); color: var(--nok); border-radius: 18px;
-  font-family: var(--display); font-weight: 800; font-size: 20px; letter-spacing: .06em; padding: 12px 10px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform .1s;
+.flags { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.redflag, .greenflag {
+  min-width: 0; border: 2.5px solid var(--nok); background: var(--nok-soft); color: var(--nok); border-radius: 18px;
+  font-family: var(--display); font-weight: 800; font-size: clamp(15px, 4.4vw, 19px); letter-spacing: .04em; padding: 12px 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; transition: transform .1s;
 }
-.redflag:active { transform: scale(.97); }
-.redflag .cnt { font-family: var(--body); font-size: 13px; font-weight: 700; background: var(--nok); color: #fff; border-radius: 999px; padding: 2px 9px; font-variant-numeric: tabular-nums; }
+.greenflag { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.redflag:active, .greenflag:active { transform: scale(.97); }
+.redflag .cnt, .greenflag .cnt { font-family: var(--body); font-size: 12px; font-weight: 700; background: var(--nok); color: #fff; border-radius: 999px; padding: 2px 8px; font-variant-numeric: tabular-nums; }
+.greenflag .cnt { background: var(--ok); }
+.party {
+  position: fixed; inset: 0; z-index: 100; overflow: hidden; display: grid; place-items: center; cursor: pointer;
+  background: radial-gradient(circle at 50% 45%, #2fd68f 0%, #0d8a55 45%, #03331f 100%);
+}
+.party[hidden] { display: none; }
+.rays {
+  position: absolute; width: 220vmax; height: 220vmax; top: 50%; left: 50%; margin: -110vmax 0 0 -110vmax; pointer-events: none;
+  background: repeating-conic-gradient(rgba(255,255,255,.16) 0deg 10deg, rgba(255,255,255,0) 10deg 24deg);
+  animation: spin 9s linear infinite;
+}
+.party .glow { position: absolute; width: 70vmin; height: 70vmin; border-radius: 50%; background: radial-gradient(circle, rgba(220,255,235,.55), rgba(220,255,235,0) 65%); animation: breathe 1.2s ease-in-out infinite alternate; }
+@keyframes breathe { from { transform: scale(.85); } to { transform: scale(1.1); } }
+.confetti { position: absolute; bottom: -40px; font-size: 26px; pointer-events: none; animation: rise linear forwards; }
+@keyframes rise { to { transform: translateY(-115vh) rotate(var(--r, 360deg)); opacity: .2; } }
+.party-text { position: relative; z-index: 1; text-shadow: 0 1px 4px rgba(0,40,20,.6); text-align: center; color: #fff; display: flex; flex-direction: column; gap: 10px; align-items: center; padding-inline: 16px; }
+.party-text b { font-family: var(--display); font-weight: 800; font-size: clamp(50px, 15vw, 104px); line-height: .9; letter-spacing: .02em; text-shadow: 0 4px 0 #075c37, 0 0 40px rgba(180,255,210,.9); animation: bounce .6s ease-in-out infinite alternate; }
+.party-text span { font-size: 15px; opacity: .9; }
+.party-text .flag { font-size: 64px; animation: wave .4s ease-in-out infinite alternate; transform-origin: bottom left; }
+@keyframes bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-10px) scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .rays, .party .glow, .party-text b, .party-text .flag, .confetti { animation: none !important; } .confetti { display: none; } }
 .siren {
   position: fixed; inset: 0; z-index: 100; overflow: hidden; display: grid; place-items: center; cursor: pointer;
   background: #2a0006; animation: flash .5s steps(1) infinite;
@@ -200,7 +223,10 @@ body { margin: 0; }
 
   <div class="actions" id="actions"></div>
 
-  <button type="button" class="redflag" id="redFlag">🚩 RED FLAG <span class="cnt" id="rfN">0</span></button>
+  <div class="flags">
+    <button type="button" class="redflag" id="redFlag">🚩 RED FLAG <span class="cnt" id="rfN">0</span></button>
+    <button type="button" class="greenflag" id="greenFlag">💚 GREEN FLAG <span class="cnt" id="gfN">0</span></button>
+  </div>
 
   <div class="siren" id="siren" hidden role="alert" aria-label="Red flag alarmı">
     <div class="beam b1"></div><div class="beam b2"></div>
@@ -208,9 +234,15 @@ body { margin: 0; }
     <div class="siren-text"><div class="flag">🚩</div><b>RED<br>FLAG!</b><span>Kapatmak için dokun</span></div>
   </div>
 
+  <div class="party" id="party" hidden role="alert" aria-label="Green flag kutlaması">
+    <div class="rays"></div><div class="glow"></div>
+    <div id="confettiBox"></div>
+    <div class="party-text"><div class="flag">💚</div><b>GREEN<br>FLAG!</b><span>Bu bir onay! Kapatmak için dokun</span></div>
+  </div>
+
   <div class="foot">
     <span id="left"></span>
-    <span class="keys">Klavye: ← NOK · → OK · boşluk atla · R red flag</span>
+    <span class="keys">Klavye: ← NOK · → OK · boşluk atla · R red flag · G green flag</span>
     <button type="button" id="reset">Desteyi baştan karıştır</button>
   </div>
 </div>
@@ -431,7 +463,7 @@ function stopSiren() {
 }
 function siren() {
   rf++; $("rfN").textContent = rf;
-  stopSiren();
+  stopSiren(); if (typeof stopParty === "function") stopParty();
   $("siren").hidden = false;
   try {
     audio = audio || new (window.AudioContext || window.webkitAudioContext)();
@@ -452,6 +484,37 @@ function siren() {
 $("redFlag").onclick = siren;
 $("siren").onclick = stopSiren;
 document.addEventListener("keydown", e => { if (e.key === "r" || e.key === "R") siren(); else if (e.key === "Escape") stopSiren(); });
+
+// GREEN FLAG
+let gf = 0, partyTimer = null;
+function stopParty() { clearTimeout(partyTimer); $("party").hidden = true; $("confettiBox").innerHTML = ""; }
+function greenFlag() {
+  gf++; $("gfN").textContent = gf;
+  stopSiren(); stopParty();
+  const box = $("confettiBox"), bits = ["💚", "✅", "🌿", "✨", "🟢", "💚", "🍀"];
+  let html = "";
+  for (let i = 0; i < 34; i++) {
+    const left = Math.random() * 100, dur = 2 + Math.random() * 1.6, delay = Math.random() * .9, size = 18 + Math.random() * 22, r = (Math.random() * 720 - 360) | 0;
+    html += `<span class="confetti" style="left:${left}%;font-size:${size}px;animation-duration:${dur}s;animation-delay:${delay}s;--r:${r}deg">${bits[i % bits.length]}</span>`;
+  }
+  box.innerHTML = html;
+  $("party").hidden = false;
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = audio.currentTime;
+    [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5].forEach((f, i) => {
+      const o = audio.createOscillator(), g = audio.createGain(), t = t0 + i * 0.13;
+      o.type = "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + (i === 5 ? 0.7 : 0.22));
+      o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.75);
+    });
+  } catch (e) {}
+  try { navigator.vibrate && navigator.vibrate([60, 60, 60]); } catch (e) {}
+  partyTimer = setTimeout(stopParty, 3000);
+}
+$("greenFlag").onclick = greenFlag;
+$("party").onclick = stopParty;
+document.addEventListener("keydown", e => { if (e.key === "g" || e.key === "G") greenFlag(); else if (e.key === "Escape") stopParty(); });
 
 $("reset").onclick = () => { buildDeck(); started ? draw() : showStart(); };
 

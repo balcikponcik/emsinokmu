@@ -20,6 +20,8 @@ Tek bir HTML dosyasıdır; kurulum, sunucu ya da kütüphane gerektirmez.
 
 **🚩 RED FLAG** düğmesine (ya da klavyede **R** tuşuna) basınca ekran kırmızı siren ışıklarıyla yanar ve siren sesi çalar. Sayaç, oyunda kaç red flag yakalandığını tutar.
 
+**💚 GREEN FLAG** düğmesine (ya da klavyede **G** tuşuna) basınca ekran yeşil ışınlar ve uçuşan kalplerle kutlama moduna geçer, neşeli bir melodi çalar. Onun da ayrı bir sayacı vardır.
+
 ## Kategoriler
 
 | Kategori | Kart |
