@@ -49,8 +49,8 @@ Tek bir HTML dosyasıdır; kurulum, sunucu ya da kütüphane gerektirmez.
 
 ### 😏 Ahmet'in Çapkınlık Dosyası
 
-Yaklaşık her 20 kartta bir sarı renkli **ÖZEL** kart gelir. Bu kartlarda Ahmet'in çapkınlığıyla ilgili 70 soru vardır. Hepsi çıktıktan sonra yeniden karıştırılıp gelmeye devam eder.
-Bu kartlar 2000'lik desteye sayılmaz, ama verilen oylar skora eklenir.
+Her 15 kartta bir sarı renkli **ÖZEL** kart gelir. Bu kartlarda Ahmet efsanesine dair 70 soru vardır. Hepsi çıktıktan sonra yeniden karıştırılıp gelmeye devam eder.
+Ahmet kartlarında **NOK düğmesi kapalıdır**, sadece OK verilebilir. 😏 Bu kartlar 2000'lik desteye sayılmaz, ama verilen oylar skora eklenir.
 
 ## GitHub Pages ile yayınlama
 
