@@ -1,6 +1,6 @@
 # 💘 Emsi Ok mu? Nok mu?
 
-Aşk, arkadaşlık, iş yeri, akrabalar, futbol, spor ve siyaset üzerine **2000 kaotik soru** içeren, rastgele kart çekilen bir parti oyunu.
+Aşk, kıskançlık, ilişkide derin sorular, arkadaşlık, iş yeri, akrabalar, futbol, spor ve siyaset üzerine **2250 kaotik soru** içeren, rastgele kart çekilen bir parti oyunu.
 Tek bir HTML dosyasıdır; kurulum, sunucu ya da kütüphane gerektirmez.
 
 ## Nasıl oynanır?
@@ -28,7 +28,8 @@ Tek bir HTML dosyasıdır; kurulum, sunucu ya da kütüphane gerektirmez.
 |---|---|
 | 💘 Flört ve Tanışma | 75 |
 | 📱 Telefon ve Sosyal Medya | 70 |
-| 😤 Kıskançlık ve Sınırlar | 65 |
+| 😤 Kıskançlık ve Sınırlar | 165 |
+| 💞 İlişkide Derin Sorular | 150 |
 | 💸 Para ve Sorumluluk | 57 |
 | 👨‍👩‍👧 Aile ve Çevre | 50 |
 | 💍 Ciddi İlişki ve Evlilik | 60 |
@@ -43,14 +44,9 @@ Tek bir HTML dosyasıdır; kurulum, sunucu ya da kütüphane gerektirmez.
 | 🗳️ Siyaset ve Toplum | 178 |
 | 🏙️ Şehir ve Gündelik Hayat | 147 |
 | 🍽️ Yeme-İçme ve Tatil | 144 |
-| **Toplam** | **2000** |
+| **Toplam** | **2250** |
 
 Üstteki **Kategoriler** menüsünü açıp sadece istediğin kategorileri oynatabilirsin.
-
-### 😏 Ahmet'in Çapkınlık Dosyası
-
-Her 15 kartta bir sarı renkli **ÖZEL** kart gelir. Bu kartlarda Ahmet efsanesine dair 70 soru vardır. Hepsi çıktıktan sonra yeniden karıştırılıp gelmeye devam eder.
-Ahmet kartlarında **NOK düğmesi kapalıdır**, sadece OK verilebilir. 😏 Bu kartlar 2000'lik desteye sayılmaz, ama verilen oylar skora eklenir.
 
 ## GitHub Pages ile yayınlama
 
