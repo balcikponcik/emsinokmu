@@ -70,7 +70,7 @@ Linki arkadaşlarına at, herkes telefondan oynayabilir.
 
 ## Soru eklemek ya da değiştirmek
 
-Bütün sorular `index.html` içindeki `CATS` (normal kartlar) ve `SPECIAL` (Ahmet kartları) dizilerindedir.
+Bütün sorular `index.html` içindeki `CATS` dizisindedir.
 Yeni soru eklemek için ilgili kategorinin `items` listesine tırnak içinde bir satır daha eklemen yeterli:
 
 ```js
@@ -80,5 +80,3 @@ Yeni soru eklemek için ilgili kategorinin `items` listesine tırnak içinde bir
   ...
 ]}
 ```
-
-Özel kartların hangi sıklıkla geleceğini `nextGap` satırından ayarlayabilirsin (şu an 18–22 kartta bir).
